@@ -11,6 +11,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Net.Http.Headers;
+using Piranha.Services;
 using Piranha.Web;
 using System;
 using System.Linq;
@@ -33,7 +34,7 @@ namespace Piranha.AspNetCore
         /// <param name="context">The current http context</param>
         /// <param name="api">The current api</param>
         /// <returns>An async task</returns>
-        public override async Task Invoke(HttpContext context, IApi api)
+        public override async Task Invoke(HttpContext context, IApi api, IRuntimeService service = null)
         {
             if (!context.Request.Path.Value.StartsWith("/manager/"))
             {
@@ -44,7 +45,13 @@ namespace Piranha.AspNetCore
                 if (!string.IsNullOrEmpty(url) && url.Length > 1)
                 {
                     var segments = url.Substring(1).Split(new char[] { '/' });
-                    site = api.Sites.GetByHostname($"{context.Request.Host.Host}/{segments[0]}");
+                    if (service != null)
+                    {
+                        site = service.GetSiteByHostname(api, $"{context.Request.Host.Host}/{segments[0]}");
+                    }
+                    else {
+                        site = api.Sites.GetByHostname($"{context.Request.Host.Host}/{segments[0]}");
+                    }
 
                     if (site != null)
                         context.Request.Path = "/" + string.Join("/", segments.Skip(1));
@@ -52,11 +59,29 @@ namespace Piranha.AspNetCore
 
                 // Try to get the requested site by hostname
                 if (site == null)
-                    site = api.Sites.GetByHostname(context.Request.Host.Host);
+                {
+                    if (service != null)
+                    {
+                        site = service.GetSiteByHostname(api, context.Request.Host.Host);
+                    }
+                    else 
+                    {
+                        site = api.Sites.GetByHostname(context.Request.Host.Host);
+                    }
+                }
 
                 // If we didn't find the site, get the default site
-                if (site == null)
-                    site = api.Sites.GetDefault();
+                if (site == null) 
+                {
+                    if (service != null)
+                    {
+                        site = service.GetDefaultSite(api);
+                    }
+                    else 
+                    {
+                        site = api.Sites.GetDefault();
+                    }
+                }
 
                 // Store the current site id for the current request
                 if (site != null)

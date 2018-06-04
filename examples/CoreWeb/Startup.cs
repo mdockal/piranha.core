@@ -56,6 +56,7 @@ namespace CoreWeb
             services.AddPiranhaIdentityWithSeed<IdentitySQLiteDb>(options => options.UseSqlite("Filename=./piranha.coreweb.db"));
             //services.AddPiranhaIdentityWithSeed<IdentitySQLiteDb>(options => options.UseSqlServer("Data Source=.\\SQLEXPRESS;Initial Catalog=piranha.core;Integrated Security=True;MultipleActiveResultSets=True"));
             services.AddPiranhaManager();
+            services.AddSingleton<IRuntimeService, RuntimeService>();
 
             return services.BuildServiceProvider();
         }

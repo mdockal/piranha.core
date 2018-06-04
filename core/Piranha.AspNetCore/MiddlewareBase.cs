@@ -10,6 +10,7 @@
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Piranha.Services;
 using System;
 using System.Threading.Tasks;
 
@@ -60,8 +61,9 @@ namespace Piranha.AspNetCore
         /// </summary>
         /// <param name="context">The current http context</param>
         /// <param name="api">The current api</param>
+        /// <param name="service">The optional runtime service</param>
         /// <returns>An async task</returns>
-        public abstract Task Invoke(HttpContext context, IApi api);
+        public abstract Task Invoke(HttpContext context, IApi api, IRuntimeService service = null);
 
         /// <summary>
         /// Checks if the request has already been handled by another

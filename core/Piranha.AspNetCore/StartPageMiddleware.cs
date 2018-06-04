@@ -11,6 +11,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Net.Http.Headers;
+using Piranha.Services;
 using Piranha.Web;
 using System;
 using System.Threading.Tasks;
@@ -32,7 +33,7 @@ namespace Piranha.AspNetCore
         /// <param name="context">The current http context</param>
         /// <param name="api">The current api</param>
         /// <returns>An async task</returns>
-        public override async Task Invoke(HttpContext context, IApi api)
+        public override async Task Invoke(HttpContext context, IApi api, IRuntimeService service = null)
         {
             if (!IsHandled(context) && !context.Request.Path.Value.StartsWith("/manager/assets/"))
             {
